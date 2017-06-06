@@ -21,10 +21,10 @@ PROCESS_THREAD(v_gateway_sink, ev, data){
 	// Init uart communication
 	uart0_set_input(serial_line_input_byte);
 	serial_line_init();
-	
+
 	while(1) {
 		// Wait for one second
-		etimer_set(&et, CLOCK_SECOND*1);
+		etimer_set(&et, CLOCK_SECOND*5);
 		PROCESS_WAIT_EVENT();
 		printf("get_max_temp()\n");
 	}

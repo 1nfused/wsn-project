@@ -4,4 +4,4 @@
 // Mote specific data
 #define MOTE_ID		"v_sink_gateway"
 
-#endif V_GATEWAY_SINK_H
+#endif
