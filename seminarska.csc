@@ -6,8 +6,10 @@
   <project EXPORT="discard">[APPS_DIR]/serial_socket</project>
   <project EXPORT="discard">[APPS_DIR]/collect-view</project>
   <project EXPORT="discard">[APPS_DIR]/powertracker</project>
+  <project EXPORT="discard">[APPS_DIR]/serial2usb</project>
   <simulation>
     <title>laboratorijska</title>
+    <speedlimit>1.0</speedlimit>
     <randomseed>123456</randomseed>
     <motedelay_us>1000000</motedelay_us>
     <radiomedium>
@@ -44,8 +46,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>49.01943370838184</x>
-        <y>45.50423450689665</y>
+        <x>39.11943370838184</x>
+        <y>82.90423450689664</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -56,13 +58,17 @@
         org.contikios.cooja.mspmote.interfaces.MspMoteID
         <id>1</id>
       </interface_config>
+      <interface_config>
+        org.contikios.cooja.mspmote.interfaces.MspDefaultSerial
+        <history>Jo~;</history>
+      </interface_config>
       <motetype_identifier>z11</motetype_identifier>
     </mote>
   </simulation>
   <plugin>
     org.contikios.cooja.plugins.SimControl
     <width>280</width>
-    <z>5</z>
+    <z>0</z>
     <height>160</height>
     <location_x>400</location_x>
     <location_y>0</location_y>
@@ -87,7 +93,7 @@
       <coloring />
     </plugin_config>
     <width>1451</width>
-    <z>4</z>
+    <z>6</z>
     <height>240</height>
     <location_x>400</location_x>
     <location_y>160</location_y>
@@ -102,7 +108,7 @@
       <zoomfactor>500.0</zoomfactor>
     </plugin_config>
     <width>1851</width>
-    <z>3</z>
+    <z>2</z>
     <height>166</height>
     <location_x>0</location_x>
     <location_y>737</location_y>
@@ -114,7 +120,7 @@
       <decorations>true</decorations>
     </plugin_config>
     <width>1171</width>
-    <z>2</z>
+    <z>5</z>
     <height>160</height>
     <location_x>680</location_x>
     <location_y>0</location_y>
@@ -127,10 +133,20 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>350</width>
-    <z>0</z>
+    <z>3</z>
     <height>300</height>
     <location_x>163</location_x>
     <location_y>411</location_y>
+  </plugin>
+  <plugin>
+    de.fau.cooja.plugins.Serial2Pty
+    <mote_arg>0</mote_arg>
+    <plugin_config />
+    <width>250</width>
+    <z>4</z>
+    <height>135</height>
+    <location_x>545</location_x>
+    <location_y>433</location_y>
   </plugin>
 </simconf>
 
