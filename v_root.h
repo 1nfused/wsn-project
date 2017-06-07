@@ -5,6 +5,11 @@
 
 #define SEND_INTERVAL CLOCK_SECOND /* clock ticks */
 #define ITERATIONS 100 /* messages */
+#define DEBUG DEBUG_PRINT
+#define SEND_INTERVAL CLOCK_SECOND /* clock ticks */
+#define UDP_CLIENT_PORT 8765
+#define UDP_SERVER_PORT 5678
+#define DELAY_CHECK_SENSORS_VALUE 3
 
 /* Start sending messages START_DELAY secs after we start so that routing can
  * converge */
@@ -14,10 +19,5 @@ typedef union network_data_t {
 	uint8_t current_temp;
 	uint8_t current_volt;
 } network_data_t;
-
-// Contiki function
-static void multicast_send(void);
-static void prepare_mcast(void);
-static void set_own_addresses(void);
 
 #endif

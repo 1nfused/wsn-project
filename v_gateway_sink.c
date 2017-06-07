@@ -26,7 +26,7 @@ PROCESS_THREAD(v_gateway_sink, ev, data){
 		// Wait for one second
 		etimer_set(&et, CLOCK_SECOND*5);
 		PROCESS_WAIT_EVENT();
-		printf("get_max_temp()\n");
+		//printf("get_max_temp()\n");
 	}
 	
 	etimer_reset(&et);	
