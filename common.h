@@ -18,6 +18,20 @@
 #define UDP_SERVER_PORT 		5678
 #define MAX_PAY_LOAD			120
 
+/* COMMAND */
+#define SET_START_M_CAST		"Z:MULT"
+#define GET_HEART_BEAT			"Z:H?"
+#define GET_TEMP_MIN			"Z:S:T:MIN?"
+#define GET_TEMP_MAX			"Z:S:T:MAX?"
+#define GET_TEMP_AVG			"Z:S:T:AVG?"
+#define GET_VIB_MIN				"Z:S:VI:MIN?"
+#define GET_VIB_MAX				"Z:S:VI:MAX?"
+#define GET_VIB_AVG				"Z:S:VI:AVG?"
+#define GET_VOLT_MIN			"Z:S:VO:MIN?"
+#define GET_VOLT_MAX			"Z:S:VO:MAX?"
+#define GET_VOLT_AVG			"Z:S:VO:AVG?"
+
+
 long get_temperature();
 int abs(int v);
 int get_normed_vibr();

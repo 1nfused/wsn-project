@@ -15,9 +15,17 @@ static struct uip_udp_conn * mcast_conn;
 static struct uip_udp_conn *server_conn;
 static char message[MAX_PAYLOAD_LEN];
 static uint32_t seq_id;
-static network_data_t *network;
 static long temperature;
 static long vibration;
+
+// Global state
+static char *current_command;
+static int active = 0;
+
+// Network statisical data
+static network_data_min_t *network_min;
+static network_data_max_t *network_max;
+static network_data_avg_t *network_avg;
 
 PROCESS(rpl_root_process, "Virtual Root Mote");
 AUTOSTART_PROCESSES(&rpl_root_process);
@@ -29,10 +37,13 @@ static void tcpip_handler(void) {
     if(uip_newdata()) {
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
-        printf("%s\n", appdata);
+        
+        if(strcmp(current_command, SET_START_M_CAST) == 0) {
+            active++;
+            printf("Currently active: %d\n", active);
+        }
     }
 }
-
 
 static void multicast_send(char *command) {
     seq_id++;
@@ -41,7 +52,6 @@ static void multicast_send(char *command) {
 
 static void prepare_mcast(void) {
     uip_ipaddr_t ipaddr;
-
     uip_ip6addr(&ipaddr, 0xFF1E,0,0,0,0,0,0x89,0xABCD);
     mcast_conn = udp_new(&ipaddr, UIP_HTONS(MCAST_SINK_UDP_PORT), NULL);
 }
@@ -131,8 +141,21 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
 
         // Parse serial event and send multicast data
         if(ev == serial_line_event_message && data != NULL){
-            leds_on(LEDS_GREEN);
-            multicast_send(data);
+            current_command = (char *)data;
+            printf("Currently executing: %s\n", &current_command[0]);
+            printf("%s\n", SET_START_M_CAST);
+            // Start multicast
+            if(strcmp(SET_START_M_CAST, current_command) == 0){
+                leds_on(LEDS_BLUE);
+                multicast_send(current_command);
+            }else if(strcmp(GET_HEART_BEAT, current_command) == 0) {
+                // Reseting network stats
+                active = 0;
+                multicast_send(current_command);
+            } else {
+                printf("Unknon command!\n");
+            }
+
         }
   }
   PROCESS_END();

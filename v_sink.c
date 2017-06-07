@@ -16,7 +16,7 @@
 static struct uip_udp_conn *client_conn;
 static struct uip_udp_conn *sink_conn;
 static uint16_t count;
-static uip_ip6addr_t src_addr;
+static uip_ip6addr_t src_addr = NULL;
 static char buffer[MAX_PAY_LOAD];
 
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
@@ -31,14 +31,22 @@ static int reply = 0;
 /*---------------------------------------------------------------------------*/
 static void tcpip_handler(void) {
     char *appdata;
-    memcpy(buffer, "Got reply!", sizeof("Got reply!"));
+    
     if(uip_newdata()) {
         count++;
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
-        printf("Data: %s\n", appdata);
+        printf("Sink received: %s\n", &appdata[0]);
+        // Parse command
+        if (strcmp(appdata, GET_HEART_BEAT) == 0){
+            memcpy(buffer, "1", strlen("1"));
+        }
+
         // Copy source ip address
-        uip_ipaddr_copy(&src_addr, &UIP_IP_BUF->srcipaddr);
+        if(src_addr != NULL) {
+            uip_ipaddr_copy(&src_addr, &UIP_IP_BUF->srcipaddr);
+        }
+        
         PRINTF("Address: %s\n", appdata);
         uip_udp_packet_sendto(
             client_conn, 
@@ -122,14 +130,15 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
             printf("Got event!\n");
             tcpip_handler();
         }
-        /*
+
         rpl_instance_t *instance = rpl_get_instance(RPL_DEFAULT_INSTANCE);
         rpl_dag_t *any_dag = rpl_get_any_dag();
         if(instance != NULL && any_dag != NULL){
+            uip_ipaddr_copy(&server_ipaddr, &any_dag->dag_id);
             leds_on(LEDS_RED);
         } else {
             leds_off(LEDS_RED);
-        }*/
+        }
     }
 
   PROCESS_END();

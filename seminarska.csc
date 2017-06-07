@@ -97,14 +97,18 @@
         org.contikios.cooja.mspmote.interfaces.MspMoteID
         <id>1</id>
       </interface_config>
+      <interface_config>
+        org.contikios.cooja.mspmote.interfaces.MspDefaultSerial
+        <history>Z:MULT~;go~;</history>
+      </interface_config>
       <motetype_identifier>z11</motetype_identifier>
     </mote>
     <mote>
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>42.641921869023555</x>
-        <y>13.56623350274585</y>
+        <x>33.14722844986836</x>
+        <y>15.427938094737065</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -139,8 +143,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>15.029090199917016</x>
-        <y>64.45062838433506</y>
+        <x>11.491851475133709</x>
+        <y>61.471901037149124</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -157,7 +161,7 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>68.24859912606071</x>
+        <x>62.663485350087065</x>
         <y>42.47011820267191</y>
         <z>0.0</z>
       </interface_config>
@@ -175,8 +179,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>56.799399216853665</x>
-        <y>74.81118285763479</y>
+        <x>60.895149319234335</x>
+        <y>69.41223954086027</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -193,8 +197,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>57.263864200387104</x>
-        <y>43.068081387842206</y>
+        <x>39.20532965807233</x>
+        <y>52.562774806997396</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -247,8 +251,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>54.15455090236947</x>
-        <y>18.231386551755747</y>
+        <x>52.10667585117913</x>
+        <y>23.81650032772939</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -283,8 +287,8 @@
       <breakpoints />
       <interface_config>
         org.contikios.cooja.interfaces.Position
-        <x>79.12946408371178</x>
-        <y>93.01990523133678</y>
+        <x>79.50180500211002</x>
+        <y>80.91882538339388</y>
         <z>0.0</z>
       </interface_config>
       <interface_config>
@@ -301,7 +305,7 @@
   <plugin>
     org.contikios.cooja.plugins.SimControl
     <width>280</width>
-    <z>0</z>
+    <z>1</z>
     <height>160</height>
     <location_x>647</location_x>
     <location_y>-2</location_y>
@@ -314,7 +318,7 @@
       <coloring />
     </plugin_config>
     <width>1079</width>
-    <z>1</z>
+    <z>3</z>
     <height>653</height>
     <location_x>641</location_x>
     <location_y>160</location_y>
@@ -340,7 +344,7 @@
       <zoomfactor>500.0</zoomfactor>
     </plugin_config>
     <width>1720</width>
-    <z>3</z>
+    <z>4</z>
     <height>166</height>
     <location_x>0</location_x>
     <location_y>814</location_y>
@@ -354,6 +358,7 @@
       <skin>org.contikios.cooja.plugins.skins.TrafficVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.UDGMVisualizerSkin</skin>
       <skin>org.contikios.cooja.plugins.skins.AddressVisualizerSkin</skin>
+      <skin>org.contikios.cooja.plugins.skins.MoteTypeVisualizerSkin</skin>
       <viewport>5.371421461287985 0.0 0.0 5.371421461287985 104.26107912594159 -40.05177596731132</viewport>
     </plugin_config>
     <width>626</width>
@@ -361,6 +366,19 @@
     <height>787</height>
     <location_x>1</location_x>
     <location_y>1</location_y>
+  </plugin>
+  <plugin>
+    org.contikios.cooja.plugins.MoteInterfaceViewer
+    <mote_arg>0</mote_arg>
+    <plugin_config>
+      <interface>Serial port</interface>
+      <scrollpos>0,29</scrollpos>
+    </plugin_config>
+    <width>631</width>
+    <z>0</z>
+    <height>156</height>
+    <location_x>934</location_x>
+    <location_y>0</location_y>
   </plugin>
 </simconf>
 

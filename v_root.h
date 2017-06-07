@@ -15,9 +15,26 @@
  * converge */
 #define START_DELAY 60
 
-typedef union network_data_t {
-	uint8_t current_temp;
-	uint8_t current_volt;
-} network_data_t;
+// Unions for network data. Only one field can be populated!
+typedef union network_data_min_t {
+	uint8_t min_temp;
+	uint8_t min_volt;
+	uint8_t min_vib;
+} network_data_min_t;
+
+typedef union network_data_max_t {
+	uint8_t max_temp;
+	uint8_t max_volt;
+	uint8_t max_vib;
+} network_data_max_t;
+
+typedef union network_data_avg_t {
+	uint8_t avg_temp;
+	uint8_t avg_volt;
+	uint8_t avg_vib;
+} network_data_avg_t;
+
+// Methods protos definitions
+
 
 #endif
