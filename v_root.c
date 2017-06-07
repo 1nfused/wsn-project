@@ -15,6 +15,7 @@
 static struct uip_udp_conn * mcast_conn;
 static char buf[MAX_PAYLOAD_LEN];
 static uint32_t seq_id;
+static network_data_t *network;
 
 PROCESS(rpl_root_process, "RPL ROOT, Multicast Sender");
 AUTOSTART_PROCESSES(&rpl_root_process);
@@ -84,15 +85,10 @@ static void set_own_addresses(void) {
 /* ---------------- MAIN THREAD ---------------- */
 PROCESS_THREAD(rpl_root_process, ev, data) {
   static struct etimer et;
-
   PROCESS_BEGIN();
-
   printf("Multicast Engine: '%s'\n", UIP_MCAST6.name);
-
   NETSTACK_MAC.off(1);
-
   set_own_addresses();
-
   prepare_mcast();
 
   etimer_set(&et, START_DELAY * CLOCK_SECOND);

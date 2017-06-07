@@ -10,6 +10,11 @@
  * converge */
 #define START_DELAY 60
 
+typedef union network_data_t {
+	uint8_t current_temp;
+	uint8_t current_volt;
+} network_data_t;
+
 // Contiki function
 static void multicast_send(void);
 static void prepare_mcast(void);

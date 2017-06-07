@@ -26,8 +26,12 @@ static void tcpip_handler(void) {
   if(uip_newdata()) {
     printf("%s\n",((char *)uip_appdata));
     printf("Printing IPv6 address.\n");
-    PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
-    PRINTF("\n");
+
+    char src_address[100]; // Set len of ipv6 in .h
+    memset(src_address, 0, sizeof(UIP_IP_BUF->srcipaddr.u8));
+    memcpy(src_address, (void *)&UIP_IP_BUF->srcipaddr.u8, sizeof(UIP_IP_BUF->srcipaddr.u16));
+    printf("Nothing to see here?\n");
+    printf("Address: %s\n", sizeof(src_address));
   }
   return;
 }
