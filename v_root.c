@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+#define DEBUG DEBUG_PRINT
+
 #include "v_root.h"
 #include "common.h"
 
@@ -22,7 +24,7 @@ static void multicast_send(void) {
 
   id = uip_htonl(seq_id);
   memset(buf, 0, MAX_PAYLOAD_LEN);
-  memcpy(buf, &id, sizeof(seq_id));
+  memcpy(buf, "Hey there peasants!", sizeof("Hey there peasants!"));
 
   PRINTF("Send to: ");
   PRINT6ADDR(&mcast_conn->ripaddr);
@@ -31,7 +33,7 @@ static void multicast_send(void) {
   PRINTF(" %lu bytes\n", (unsigned long)sizeof(id));
 
   seq_id++;
-  uip_udp_packet_send(mcast_conn, buf, sizeof(id));
+  uip_udp_packet_send(mcast_conn, buf, sizeof("Hey there peasants!"));
 }
 
 static void prepare_mcast(void) {
@@ -95,7 +97,6 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
 
   etimer_set(&et, START_DELAY * CLOCK_SECOND);
   while(1) {
-    printf("I am your father!\n");
     PROCESS_YIELD();
     if(etimer_expired(&et)) {
       if(seq_id == ITERATIONS) {

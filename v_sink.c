@@ -3,8 +3,12 @@
 #include "contiki-net.h"
 #include "net/ipv6/multicast/uip-mcast6.h"
 #include "net/ip/uip-debug.h"
+#include "dev/leds.h"
+#include "dev/button-sensor.h"
 
 #include <string.h>
+
+#define DEBUG DEBUG_PRINT
 
 #include "v_sink.h"
 #include "common.h"
@@ -20,12 +24,10 @@ AUTOSTART_PROCESSES(&mcast_sink_process);
 /*---------------------------------------------------------------------------*/
 static void tcpip_handler(void) {
   if(uip_newdata()) {
-    count++;
-    printf("In: [0x%08lx], TTL %u, total %u\n",
-        uip_ntohl((unsigned long) *((uint32_t *)(uip_appdata))),
-        UIP_IP_BUF->ttl, count);
-    printf("%u\n", 
-      UIP_IP_BUF->srcipaddr);
+    printf("%s\n",((char *)uip_appdata));
+    printf("Printing IPv6 address.\n");
+    PRINT6ADDR(&UIP_IP_BUF->srcipaddr);
+    PRINTF("\n");
   }
   return;
 }
@@ -47,9 +49,9 @@ static uip_ds6_maddr_t *join_mcast_group(void){
   rv = uip_ds6_maddr_add(&addr);
 
   if(rv) {
-    PRINTF("Joined multicast group ");
+    printf("Joined multicast group ");
     PRINT6ADDR(&uip_ds6_maddr_lookup(&addr)->ipaddr);
-    PRINTF("\n");
+    printf("\n");
   }
   return rv;
 }
@@ -58,7 +60,8 @@ static uip_ds6_maddr_t *join_mcast_group(void){
 PROCESS_THREAD(mcast_sink_process, ev, data) {
   PROCESS_BEGIN();
 
-  PRINTF("Multicast Engine: '%s'\n", UIP_MCAST6.name);
+  SENSORS_ACTIVATE(button_sensor);
+  printf("Multicast Engine: '%s'\n", UIP_MCAST6.name);
 
   if(join_mcast_group() == NULL) {
     PRINTF("Failed to join multicast group\n");
@@ -75,11 +78,18 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
   printf(" local/remote port %u/%u\n",
         UIP_HTONS(sink_conn->lport), UIP_HTONS(sink_conn->rport));
 
+  printf("Waiting for tcp event.\n");
   while(1) {
-    PROCESS_YIELD();
+    PROCESS_WAIT_EVENT();
+    leds_off(LEDS_ALL);
     if(ev == tcpip_event) {
+      printf("\nGot event!\n");
       tcpip_handler();
+    } else if((ev == sensors_event) && (data == &button_sensor)){
+      printf("\nButton event!!\n");
     }
+
+    leds_on(LEDS_ALL);
   }
 
   PROCESS_END();
