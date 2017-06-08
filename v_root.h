@@ -9,7 +9,6 @@
 #define SEND_INTERVAL CLOCK_SECOND /* clock ticks */
 #define UDP_CLIENT_PORT 8765
 #define UDP_SERVER_PORT 5678
-#define DELAY_CHECK_SENSORS_VALUE 3
 
 /* Start sending messages START_DELAY secs after we start so that routing can
  * converge */

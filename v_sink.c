@@ -3,6 +3,8 @@
 #include "contiki-net.h"
 #include "net/ipv6/multicast/uip-mcast6.h"
 #include "net/ip/uip-debug.h"
+#include "net/rpl/rpl.h"
+#include "node-id.h"
 
 #include <string.h>
 
@@ -16,8 +18,10 @@
 static struct uip_udp_conn *client_conn;
 static struct uip_udp_conn *sink_conn;
 static uint16_t count;
-static uip_ip6addr_t src_addr = NULL;
+static uip_ip6addr_t src_addr;
 static char buffer[MAX_PAY_LOAD];
+static float THRESH_HOLD_TEMPERATURE = 10;
+static float THRESH_HOLD_VIBRATION = 2;
 
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
 
@@ -25,8 +29,37 @@ static char buffer[MAX_PAY_LOAD];
 PROCESS(mcast_sink_process, "Multicast Sink");
 AUTOSTART_PROCESSES(&mcast_sink_process);
 
-static int seq_id = 0;
-static int reply = 0;
+static long get_temperature(){
+    // Example from: contiki/examples/z1/tst-tmp102.c
+    int16_t raw;
+    uint16_t absraw;    
+    long temperature = 0;
+    
+    raw = tmp102_read_temp_raw();
+    absraw = raw;   
+    printf("RAW: %d\n", raw);
+    temperature = (absraw >> 8);  // temp_int
+    temperature *= 10000;
+    temperature += ((absraw >> 4) % 16) * 625;  // Info in 1/10000 of degree  // temp_frac  
+    temperature = temperature / 1000;
+    printf("Acq temp: %d\n", (int)temperature);
+    return temperature;
+    //return 100 + node_id;
+}
+
+int abs(int v) {
+    return v * ((v>0) - (v<0));
+}
+
+int get_normed_vibr() {
+    int x, y, z, norm;
+    x = accm_read_axis(X_AXIS);
+    y = accm_read_axis(Y_AXIS);
+    z = accm_read_axis(Z_AXIS);
+    norm = abs(x) + abs(y) + abs(z);
+    norm = norm % 1000;
+    return norm;
+}
 
 /*---------------------------------------------------------------------------*/
 static void tcpip_handler(void) {
@@ -40,22 +73,32 @@ static void tcpip_handler(void) {
         // Parse command
         if (strcmp(appdata, GET_HEART_BEAT) == 0){
             memcpy(buffer, "1", strlen("1"));
+        } else if((strcmp(appdata, GET_TEMP_MIN) == 0) ||
+                  (strcmp(appdata, GET_TEMP_MAX) == 0) ||
+                  (strcmp(appdata, GET_TEMP_AVG) == 0)){
+            double t = (double)get_temperature();
+            printf("TEmp: %f\n", t);
+            sprintf(buffer, NODE_RES_FORMAT, node_id, t);
+        } else if((strcmp(appdata, GET_VIB_MIN) == 0) ||
+                  (strcmp(appdata, GET_VIB_MAX) == 0) ||
+                  (strcmp(appdata, GET_VIB_AVG) == 0)) {
+            sprintf(buffer, NODE_RES_FORMAT, node_id, (double)get_normed_vibr());
+        } else if((strcmp(appdata, GET_VOLT_MIN) == 0) ||
+                  (strcmp(appdata, GET_VOLT_MAX) == 0) ||
+                  (strcmp(appdata, GET_VOLT_AVG) ==0)) {
+            printf("NOT IMPLEMENTED\n");
         }
 
-        // Copy source ip address
-        if(src_addr != NULL) {
-            uip_ipaddr_copy(&src_addr, &UIP_IP_BUF->srcipaddr);
-        }
-        
-        PRINTF("Address: %s\n", appdata);
-        uip_udp_packet_sendto(
-            client_conn, 
-            buffer,
-            strlen(buffer), 
-            &src_addr, 
-            UIP_HTONS(UDP_SERVER_PORT));
+        printf("%s\n", &buffer[0]);
+        uip_ipaddr_copy(&src_addr, &UIP_IP_BUF->srcipaddr);
+        // Send data back to the client
+        send_data();
     }
     return;
+}
+
+static void send_data(void) {
+    uip_udp_packet_sendto(client_conn, buffer, strlen(buffer), &src_addr, UIP_HTONS(UDP_SERVER_PORT));
 }
 
 static uip_ds6_maddr_t *join_mcast_group(void){
@@ -122,10 +165,29 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
     PRINTF("*SINK: Created a connection with the server ");
     PRINTF(" local/remote port %u/%u\n", UIP_HTONS(client_conn->lport), UIP_HTONS(client_conn->rport));
 
+    etimer_set(&et_sensor, CLOCK_SECOND);
+
     while(1) {
-        printf("Waiting for event!\n");
         PROCESS_WAIT_EVENT();
-        printf("Gotcha!\n");
+        // Alarms
+        if(etimer_expired(&et_sensor)) {
+            int temperature = (int)get_temperature();
+            int vibration = (int)get_normed_vibr();
+
+            // Check temp thresh
+            if(temperature > THRESH_HOLD_TEMPERATURE){
+                sprintf(buffer, NODE_RES_FORMAT, node_id, (double)temperature);
+                send_data();
+            } 
+            // Check vibration thresh
+            if(vibration > THRESH_HOLD_VIBRATION) {
+                sprintf(buffer, NODE_RES_FORMAT, node_id, (double)vibration);
+                send_data();
+            }
+            // Set sensor check delay
+            etimer_set(&et_sensor, DELAY_CHECK_SENSORS_VALUE * CLOCK_SECOND);
+        }
+
         if(ev == tcpip_event) {
             printf("Got event!\n");
             tcpip_handler();
@@ -134,7 +196,7 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
         rpl_instance_t *instance = rpl_get_instance(RPL_DEFAULT_INSTANCE);
         rpl_dag_t *any_dag = rpl_get_any_dag();
         if(instance != NULL && any_dag != NULL){
-            uip_ipaddr_copy(&server_ipaddr, &any_dag->dag_id);
+            uip_ipaddr_copy(&src_addr, &any_dag->dag_id);
             leds_on(LEDS_RED);
         } else {
             leds_off(LEDS_RED);

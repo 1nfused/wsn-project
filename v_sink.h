@@ -3,4 +3,6 @@
 
 #define IPV6_BASE_SIZE		32
 
+static void send_data();
+
 #endif

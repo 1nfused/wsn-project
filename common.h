@@ -11,14 +11,16 @@
 #include "dev/uart0.h"
 
 // Comunication specific data
-#define MAX_CMD_LENGTH			100
-#define MCAST_SINK_UDP_PORT 	3001 /* Host byte order */
-#define UNICAST_CHANNEL			110
-#define UDP_CLIENT_PORT 		8765
-#define UDP_SERVER_PORT 		5678
-#define MAX_PAY_LOAD			120
-
+#define MAX_CMD_LENGTH				100
+#define MCAST_SINK_UDP_PORT 		3001 /* Host byte order */
+#define UNICAST_CHANNEL				110
+#define UDP_CLIENT_PORT 			8765
+#define UDP_SERVER_PORT 			5678
+#define MAX_PAY_LOAD				120
+#define NODE_RES_FORMAT				"M:%dD:%f"
+#define DELAY_CHECK_SENSORS_VALUE 	5
 /* COMMAND */
+#define GET_USAGE				"Z:USAGE"
 #define SET_START_M_CAST		"Z:MULT"
 #define GET_HEART_BEAT			"Z:H?"
 #define GET_TEMP_MIN			"Z:S:T:MIN?"
@@ -31,9 +33,5 @@
 #define GET_VOLT_MAX			"Z:S:VO:MAX?"
 #define GET_VOLT_AVG			"Z:S:VO:AVG?"
 
-
-long get_temperature();
-int abs(int v);
-int get_normed_vibr();
 
 #endif

@@ -15,8 +15,6 @@ static struct uip_udp_conn * mcast_conn;
 static struct uip_udp_conn *server_conn;
 static char message[MAX_PAYLOAD_LEN];
 static uint32_t seq_id;
-static long temperature;
-static long vibration;
 
 // Global state
 static char *current_command;
@@ -30,6 +28,22 @@ static network_data_avg_t *network_avg;
 PROCESS(rpl_root_process, "Virtual Root Mote");
 AUTOSTART_PROCESSES(&rpl_root_process);
 
+// Print usage
+static void usage(void) {
+    printf("List of avaliable commands:\n");
+    printf("Z:MULT - Start multicast process\n");
+    printf("Z:H? - Heart beat function. Check what motes are avaliable\n");
+    printf("Z:S:T:MIN? - Get min temperature\n");
+    printf("Z:S:T:MAX? - Get max temperature\n");
+    printf("Z:S:T:AVG? - Get avg temperature\n");
+    printf("Z:S:T:MIN? - Get min voltage\n");
+    printf("Z:S:T:MAX? - Get max voltage\n");
+    printf("Z:S:T:AVG? - Get avg voltage\n");
+    printf("Z:S:T:MIN? - Get min vibrations\n");
+    printf("Z:S:T:MAX? - Get max vibrations\n");
+    printf("Z:S:T:AVG? - Get avg vibrations\n");
+}
+
 // Handle unicast receive
 static void tcpip_handler(void) {
     char *appdata;
@@ -38,9 +52,21 @@ static void tcpip_handler(void) {
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
         
-        if(strcmp(current_command, SET_START_M_CAST) == 0) {
+        if(strcmp(current_command, GET_HEART_BEAT) == 0) {
             active++;
             printf("Currently active: %d\n", active);
+        } else if(strcmp(current_command, GET_TEMP_MIN) == 0){
+            printf("Got new min temperature: %s\n", appdata);
+        } else if(strcmp(current_command, GET_TEMP_MAX) == 0){
+            printf("Got new max temperature: %s\n", appdata);
+        } else if(strcmp(current_command, GET_TEMP_AVG) == 0){
+            printf("Got new avg temperature: %s\n", appdata);
+        } else if(strcmp(current_command, GET_VIB_MIN) == 0){
+            printf("Got new min vibrations: %s\n", appdata);
+        } else if(strcmp(current_command, GET_VIB_MAX) == 0){
+            printf("Got new max vibrations: %s\n", appdata);
+        } else if(strcmp(current_command, GET_VIB_AVG) == 0){
+            printf("Got new avg vibrations: %s\n", appdata);
         }
     }
 }
@@ -143,17 +169,12 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
         if(ev == serial_line_event_message && data != NULL){
             current_command = (char *)data;
             printf("Currently executing: %s\n", &current_command[0]);
-            printf("%s\n", SET_START_M_CAST);
             // Start multicast
-            if(strcmp(SET_START_M_CAST, current_command) == 0){
-                leds_on(LEDS_BLUE);
-                multicast_send(current_command);
-            }else if(strcmp(GET_HEART_BEAT, current_command) == 0) {
-                // Reseting network stats
+            if(strcmp(GET_USAGE, current_command) == 0) {
+                usage();
+            } else {
                 active = 0;
                 multicast_send(current_command);
-            } else {
-                printf("Unknon command!\n");
             }
 
         }
