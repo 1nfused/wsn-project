@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6300 64-bit) (preloaded format=pdflatex 2017.5.3)  13 JUN 2017 19:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6300 64-bit) (preloaded format=pdflatex 2017.5.3)  13 JUN 2017 22:49
 entering extended mode
 **./erk.tex
 (erk.tex
@@ -535,17 +535,6 @@ G,.JBIG2,.JB2,.eps]
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Runaway argument?
-{$^{1}$University of Ljubljana, FRI\\ 
-! Paragraph ended before \affiliation was complete.
-<to be read again> 
-                   \par 
-l.22 
-     
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 25.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
@@ -560,28 +549,49 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 25.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 25.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 41.
+<structure.png, id=1, 235.1184pt x 234.6366pt>
+File: structure.png Graphic file (type png)
+ <use structure.png>
+Package pdftex.def Info: structure.png used on input line 46.
+(pdftex.def)             Requested size: 188.09496pt x 187.70952pt.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 53.
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\omsptm.fd"
+File: omsptm.fd 
+)
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 53.
+
+Overfull \hbox (4.47581pt too wide) in paragraph at lines 54--55
+[]\OT1/ptm/b/n/10 Q: \OT1/ptm/m/n/10 Min-i-mum tem-per-a-ture across the whole 
+net-work. 
+ []
+
 [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
 
-
-] (erk.aux) ) 
+ <./structure.png>]
+(erk.aux) ) 
 Here is how much of TeX's memory you used:
- 2790 strings out of 493328
- 37463 string characters out of 3139125
- 110160 words of memory out of 3000000
- 6277 multiletter control sequences out of 15000+200000
- 14418 words of font info for 34 fonts, out of 3000000 for 9000
+ 2817 strings out of 493328
+ 37865 string characters out of 3139125
+ 114168 words of memory out of 3000000
+ 6297 multiletter control sequences out of 15000+200000
+ 17122 words of font info for 37 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 39i,10n,25p,292b,181s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8r.enc}<C:/Progr
-am Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program Files/M
-iKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/t
-ype1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/ut
-mri8a.pfb>
-Output written on erk.pdf (1 page, 51516 bytes).
+ 39i,10n,25p,808b,256s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8r.enc}<C:/Program
+ Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Program Files/MiK
+TeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fo
+nts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
+1/urw/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8
+a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
+Output written on erk.pdf (1 page, 92124 bytes).
 PDF statistics:
- 23 PDF objects out of 1000 (max. 8388607)
+ 33 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
