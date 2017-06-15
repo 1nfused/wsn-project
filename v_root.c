@@ -7,6 +7,7 @@
 #include "net/rime/rime.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "v_root.h"
 #include "common.h"
@@ -15,6 +16,11 @@ static struct uip_udp_conn * mcast_conn;
 static struct uip_udp_conn *server_conn;
 static char message[MAX_PAYLOAD_LEN];
 static uint32_t seq_id;
+
+// TODO:
+// Parse method for alarms & normal data.
+// Number of packets sent, so we know how many to except & a delay
+// in case not all of 'em arrive.
 
 // Global state
 static char *current_command;
@@ -56,17 +62,22 @@ static void tcpip_handler(void) {
             active++;
             printf("Currently active: %d\n", active);
         } else if(strcmp(current_command, GET_TEMP_MIN) == 0){
-            printf("Got new min temperature: %s\n", appdata);
+            printf("Got temperature back!\n");
+            printf("%s\n", appdata);
+            network_min->temp = 8.12;
         } else if(strcmp(current_command, GET_TEMP_MAX) == 0){
-            printf("Got new max temperature: %s\n", appdata);
+            network_max->temp = 2;
         } else if(strcmp(current_command, GET_TEMP_AVG) == 0){
-            printf("Got new avg temperature: %s\n", appdata);
+            //network_min.min_temp = atof(appdata);
         } else if(strcmp(current_command, GET_VIB_MIN) == 0){
-            printf("Got new min vibrations: %s\n", appdata);
+            network_min->vib = 5;
         } else if(strcmp(current_command, GET_VIB_MAX) == 0){
-            printf("Got new max vibrations: %s\n", appdata);
+            network_max->vib = 1;
         } else if(strcmp(current_command, GET_VIB_AVG) == 0){
             printf("Got new avg vibrations: %s\n", appdata);
+        // No command was executed
+        } else {
+            printf("Alarams: %s\n", appdata);
         }
     }
 }
@@ -133,17 +144,13 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
     accm_init();
     tmp102_init();
 
-    PRINTF("*ROOT: Creating new udp connection\n"); 
     server_conn = udp_new(NULL, UIP_HTONS(UDP_CLIENT_PORT), NULL);
     if(server_conn == NULL) {
         PRINTF("*ROOT: No UDP connection available, exiting the process!\n");
         PROCESS_EXIT();
     }
     udp_bind(server_conn, UIP_HTONS(UDP_SERVER_PORT));
-
-    PRINTF("*ROOT: Created a server connection with remote address ");
-    PRINTF(" local/remote port %u/%u\n", UIP_HTONS(server_conn->lport), UIP_HTONS(server_conn->rport));
-    
+   
     etimer_set(&et_sensor, CLOCK_SECOND);
     while(1) {
         PROCESS_YIELD();
@@ -161,7 +168,6 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
 
         /* Wait for mote responses */
         if(ev == tcpip_event) {
-            printf("Got tcpip event.\n");
             tcpip_handler();
         }
 

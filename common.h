@@ -17,11 +17,15 @@
 #define UDP_CLIENT_PORT 			8765
 #define UDP_SERVER_PORT 			5678
 #define MAX_PAY_LOAD				120
-#define NODE_RES_FORMAT				"M:%dD:%f"
 #define DELAY_CHECK_SENSORS_VALUE 	5
+
+// Result buffers
+#define NODE_RES_FORMAT				"%d-%d"
+#define NODE_ALRM_T_FORMAT			"A_T-%d-%d"
+#define NODE_ALRM_V_FORMAT			"A_V-%d-%d"
+
 /* COMMAND */
 #define GET_USAGE				"Z:USAGE"
-#define SET_START_M_CAST		"Z:MULT"
 #define GET_HEART_BEAT			"Z:H?"
 #define GET_TEMP_MIN			"Z:S:T:MIN?"
 #define GET_TEMP_MAX			"Z:S:T:MAX?"
@@ -33,5 +37,15 @@
 #define GET_VOLT_MAX			"Z:S:VO:MAX?"
 #define GET_VOLT_AVG			"Z:S:VO:AVG?"
 
+//Thresholds
+#define GET_UPDATE_CLK			"Z:U:THR:CLK?"
+#define SET_UPDATE_CLK			"Z:U:THR:CLK"
+
+#define GET_TEMP_THR			"Z:S:T:THR?"
+#define SET_TEMP_THR			"Z:S:T:THR"
+#define GET_VIB_THR				"Z:S:VI:THR?"
+#define SET_VIB_THR				"Z:S:VI:THR"
+#define GET_VOLT_THR			"Z:S:VO:THR?"
+#define SET_VOLT_THR			"Z:S:VO:THR"
 
 #endif
