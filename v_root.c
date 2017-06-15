@@ -208,8 +208,9 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
 
         // Parse serial event and send multicast data
         if(ev == serial_line_event_message && data != NULL){
+            leds_on(LEDS_BLUE);
             current_command = (char *)data;
-            //printf("Currently executing: %s\n", &current_command[0]);
+            printf("Currently executing: %s\n", &current_command[0]);
             // Start multicast
             if(strcmp(GET_USAGE, current_command) == 0) {
                 usage();
@@ -220,5 +221,6 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
 
         }
   }
+
   PROCESS_END();
 }

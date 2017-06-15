@@ -1,7 +1,17 @@
-#ifndef V_GATEWAY_SINK_H
-#define V_GATEWAY_SINK_H
+#ifndef V_SINK_H
+#define V_SINK_H
 
-// Mote specific data
-#define MOTE_ID		"v_sink_gateway"
+#define IPV6_BASE_SIZE				32
+#define DEBUG DEBUG_PRINT
+#define UDP_CLIENT_PORT 			8765
+#define UDP_SERVER_PORT 			5678
+
+#define DEFAULT_TEMP_THRESHOLD		10
+#define DEFAULT_VIB_THRESHOLD		200
+
+static void send_data();
+void get_temperature(uint16_t *temperature);
+void get_normed_vibr(uint16_t *vibration);
+void check_alarms(bool force_report);
 
 #endif
