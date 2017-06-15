@@ -21,8 +21,8 @@
 
 // Result buffers
 #define NODE_RES_FORMAT				"%d-%d"
-#define NODE_ALRM_T_FORMAT			"A_T-%d-%d"
-#define NODE_ALRM_V_FORMAT			"A_V-%d-%d"
+#define NODE_ALRM_T_FORMAT			"A_T-%d:%d"
+#define NODE_ALRM_V_FORMAT			"A_V-%d:%d"
 
 /* COMMAND */
 #define GET_USAGE				"Z:USAGE"

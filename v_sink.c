@@ -8,6 +8,8 @@
 
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "v_sink.h"
 #include "common.h"
@@ -17,10 +19,13 @@ static struct uip_udp_conn *sink_conn;
 static uint16_t count;
 static uip_ip6addr_t src_addr;
 static char buffer[MAX_PAY_LOAD];
-static uint16_t temperature;
-static uint16_t vibration;
+uint16_t temperature;
+uint16_t vibration;
 
 #define UIP_IP_BUF   ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
+
+uint16_t threshold_temperature;
+uint16_t threshold_vibration;
 
 /*---------------------------------------------------------------------------*/
 PROCESS(mcast_sink_process, "Multicast Sink");
@@ -63,22 +68,38 @@ static void tcpip_handler(void) {
         count++;
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
+        char *pChr = strtok (appdata, "-");
+        uint16_t value = atoi(strtok(NULL, "-"));   
         // Parse command
         if (strcmp(appdata, GET_HEART_BEAT) == 0){
+        
             memcpy(buffer, "1", strlen("1"));
+        
         } else if((strcmp(appdata, GET_TEMP_MIN) == 0) ||
                   (strcmp(appdata, GET_TEMP_MAX) == 0) ||
                   (strcmp(appdata, GET_TEMP_AVG) == 0)){
+
             sprintf(buffer, "M:1-D:8.12\n"); 
+        
         } else if((strcmp(appdata, GET_VIB_MIN) == 0) ||
                   (strcmp(appdata, GET_VIB_MAX) == 0) ||
                   (strcmp(appdata, GET_VIB_AVG) == 0)) {
             get_normed_vibr(&vibration);
             sprintf(buffer, NODE_RES_FORMAT, node_id, vibration);
-        }
 
+        } else if(strcmp(pChr, SET_TEMP_THR) == 0) {
+            printf("%d\n", value);
+            threshold_temperature = value;
+            printf("new tempeature threshold: %d\n", threshold_temperature);
+        
+        } else if(strcmp(pChr, SET_VIB_THR) == 0) {
+            threshold_vibration = value;
+            printf("NEW VIB THRESHOLD: %d\n", threshold_vibration);
+        }else {
+            printf("Invalid command!\n");   
+        }
+        
         uip_ipaddr_copy(&src_addr, &UIP_IP_BUF->srcipaddr);
-        // Send data back to the client
         send_data();
     }
     return;
@@ -112,33 +133,40 @@ static uip_ds6_maddr_t *join_mcast_group(void){
     return rv;
 }
 
-void check_alarms() {
-    leds_on(LEDS_BLUE);
+void check_alarms(bool force_report) {
+    leds_on(LEDS_RED);
     bool alarmed_state = false;
     /* Alarms core compilement problem. */
     get_temperature(&temperature);
     get_normed_vibr(&vibration);
 
-    // Alarms
-    if(temperature > THRESH_HOLD_TEMPERATURE){
-        printf("%d\n", temperature);
+    if(temperature > threshold_temperature){
         sprintf(buffer, NODE_ALRM_T_FORMAT, node_id, temperature);
         alarmed_state = true;
-    } else if(vibration > THRESH_HOLD_VIBRATION) {
+    } else if(vibration > threshold_vibration) {
         sprintf(buffer, NODE_ALRM_V_FORMAT, node_id, vibration);
         alarmed_state = true;
     } else {
         alarmed_state = false;
     }
-    // Turn off alarmed state if no threshold is surpassed
+    // Turn off alarmed state if no threshold is 
     if(alarmed_state) {
+        send_data();
+    }
+
+    // Alarms
+    if(force_report == true){
+        printf("Triggered!\n");
+        sprintf(buffer, NODE_ALRM_T_FORMAT, node_id, 2);
         send_data();
     }
 }
 
-
 /* MAIN THREAD */
 PROCESS_THREAD(mcast_sink_process, ev, data) {
+    threshold_temperature = DEFAULT_TEMP_THRESHOLD;
+    threshold_vibration = DEFAULT_VIB_THRESHOLD;
+
     static struct etimer et_sensor;
     PROCESS_BEGIN();
     if(join_mcast_group() == NULL) {
@@ -149,6 +177,7 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
     udp_bind(sink_conn, UIP_HTONS(MCAST_SINK_UDP_PORT));
 
     // Activate sensors
+    SENSORS_ACTIVATE(button_sensor);
     accm_init();
     tmp102_init();
 
@@ -164,7 +193,7 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
     while(1) {
         PROCESS_WAIT_EVENT();
         if(etimer_expired(&et_sensor)) {
-            check_alarms();
+            check_alarms(false);
             etimer_set(&et_sensor, CLOCK_SECOND * 4 + random_rand() % (CLOCK_SECOND * 4));
         }
 
@@ -172,14 +201,20 @@ PROCESS_THREAD(mcast_sink_process, ev, data) {
             tcpip_handler();
         }
 
+        // Force mote report directly to root
+        if((ev == sensors_event) && (data == &button_sensor)) {
+            printf("Sending force alarm.\n");
+            check_alarms(true);
+        }
+
         // Create DAG
         rpl_instance_t *instance = rpl_get_instance(RPL_DEFAULT_INSTANCE);
         rpl_dag_t *any_dag = rpl_get_any_dag();
         if(instance != NULL && any_dag != NULL){
             uip_ipaddr_copy(&src_addr, &any_dag->dag_id);
-            leds_on(LEDS_RED);
+            leds_on(LEDS_GREEN);
         } else {
-            leds_off(LEDS_RED);
+            leds_off(LEDS_GREEN);
         }
     }
 

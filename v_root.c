@@ -50,10 +50,26 @@ static void usage(void) {
     printf("Z:S:T:AVG? - Get avg vibrations\n");
 }
 
+void parseResult(char **appdata, uint16_t *ptr, int type){
+    char *pChr = strtok (*appdata, "-:");
+    switch(type) {
+        case 1:
+            while (pChr != NULL) {
+                printf ("%s\n", pChr);
+                pChr = strtok(NULL, "-:");
+            }
+            break;
+        case 2:
+            break;
+        default:
+            printf("Invalid data.\n");
+    }
+    *ptr = 10;
+}
+
 // Handle unicast receive
 static void tcpip_handler(void) {
     char *appdata;
-    printf("In function.\n");
     if(uip_newdata()) {
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
@@ -62,9 +78,14 @@ static void tcpip_handler(void) {
             active++;
             printf("Currently active: %d\n", active);
         } else if(strcmp(current_command, GET_TEMP_MIN) == 0){
-            printf("Got temperature back!\n");
-            printf("%s\n", appdata);
-            network_min->temp = 8.12;
+            
+            // Parse recevied result
+            uint16_t temperature;
+            parseResult(&appdata, &temperature, 1);
+            if (network_min->temp > temperature) {
+                network_min->temp = temperature;
+            }
+
         } else if(strcmp(current_command, GET_TEMP_MAX) == 0){
             network_max->temp = 2;
         } else if(strcmp(current_command, GET_TEMP_AVG) == 0){
@@ -83,6 +104,7 @@ static void tcpip_handler(void) {
 }
 
 static void multicast_send(char *command) {
+    printf("Sending: %s\n", command);
     seq_id++;
     uip_udp_packet_send(mcast_conn, command, strlen(&command[0]));
 }
@@ -156,8 +178,6 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
         PROCESS_YIELD();
 
         if(etimer_expired(&et)){
-            //temperature = get_temperature();
-            //vibration = get_normed_vibr();
 
             PRINTF("Timer expired.\n");
             leds_off(LEDS_GREEN);
@@ -168,13 +188,14 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
 
         /* Wait for mote responses */
         if(ev == tcpip_event) {
+            printf("Got new event!\n");
             tcpip_handler();
         }
 
         // Parse serial event and send multicast data
         if(ev == serial_line_event_message && data != NULL){
             current_command = (char *)data;
-            printf("Currently executing: %s\n", &current_command[0]);
+            //printf("Currently executing: %s\n", &current_command[0]);
             // Start multicast
             if(strcmp(GET_USAGE, current_command) == 0) {
                 usage();
