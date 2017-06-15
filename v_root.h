@@ -16,21 +16,21 @@
 
 // Unions for network data. Only one field can be populated!
 typedef union network_data_min_t {
-	uint8_t temp;
-	uint8_t volt;
-	uint8_t vib;
+	uint16_t temp;
+	uint16_t volt;
+	uint16_t vib;
 } network_data_min_t;
 
 typedef union network_data_max_t {
-	uint8_t temp;
-	uint8_t volt;
-	uint8_t vib;
+	uint16_t temp;
+	uint16_t volt;
+	uint16_t vib;
 } network_data_max_t;
 
 typedef union network_data_avg_t {
-	uint8_t temp;
-	uint8_t volt;
-	uint8_t vib;
+	uint16_t temp;
+	uint16_t volt;
+	uint16_t vib;
 } network_data_avg_t;
 
 // Methods protos definitions

@@ -69,7 +69,7 @@ static void tcpip_handler(void) {
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
         char *pChr = strtok (appdata, "-");
-        uint16_t value = atoi(strtok(NULL, "-"));   
+        uint16_t value = atoi(strtok(NULL, "-"));
         // Parse command
         if (strcmp(appdata, GET_HEART_BEAT) == 0){
         
@@ -78,9 +78,9 @@ static void tcpip_handler(void) {
         } else if((strcmp(appdata, GET_TEMP_MIN) == 0) ||
                   (strcmp(appdata, GET_TEMP_MAX) == 0) ||
                   (strcmp(appdata, GET_TEMP_AVG) == 0)){
-
-            sprintf(buffer, "M:1-D:8.12\n"); 
-        
+            get_temperature(&temperature);
+            sprintf(buffer, NODE_RES_FORMAT, node_id, 10);
+            printf("Sending data: %s\n", &buffer[0]);
         } else if((strcmp(appdata, GET_VIB_MIN) == 0) ||
                   (strcmp(appdata, GET_VIB_MAX) == 0) ||
                   (strcmp(appdata, GET_VIB_AVG) == 0)) {

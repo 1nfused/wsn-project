@@ -7,7 +7,7 @@
 #define UDP_SERVER_PORT 			5678
 
 #define DEFAULT_TEMP_THRESHOLD		10
-#define DEFAULT_VIB_THRESHOLD		1000
+#define DEFAULT_VIB_THRESHOLD		200
 
 static void send_data();
 void get_temperature(uint16_t *temperature);

@@ -18,9 +18,10 @@
 #define UDP_SERVER_PORT 			5678
 #define MAX_PAY_LOAD				120
 #define DELAY_CHECK_SENSORS_VALUE 	5
+#define MAX_MOTES					10
 
 // Result buffers
-#define NODE_RES_FORMAT				"%d-%d"
+#define NODE_RES_FORMAT				"%d:%d"
 #define NODE_ALRM_T_FORMAT			"A_T-%d:%d"
 #define NODE_ALRM_V_FORMAT			"A_V-%d:%d"
 

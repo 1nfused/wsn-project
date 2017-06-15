@@ -14,17 +14,13 @@
 
 static struct uip_udp_conn * mcast_conn;
 static struct uip_udp_conn *server_conn;
-static char message[MAX_PAYLOAD_LEN];
 static uint32_t seq_id;
-
-// TODO:
-// Parse method for alarms & normal data.
-// Number of packets sent, so we know how many to except & a delay
-// in case not all of 'em arrive.
 
 // Global state
 static char *current_command;
-static int active = 0;
+static int active_motes = 0;
+int data_recv_vib = 0;
+int data_recv_temp = 0;
 
 // Network statisical data
 static network_data_min_t *network_min;
@@ -50,52 +46,70 @@ static void usage(void) {
     printf("Z:S:T:AVG? - Get avg vibrations\n");
 }
 
-void parseResult(char **appdata, uint16_t *ptr, int type){
-    char *pChr = strtok (*appdata, "-:");
-    switch(type) {
-        case 1:
-            while (pChr != NULL) {
-                printf ("%s\n", pChr);
-                pChr = strtok(NULL, "-:");
-            }
-            break;
-        case 2:
-            break;
-        default:
-            printf("Invalid data.\n");
-    }
-    *ptr = 10;
+void parseResult(char **appdata, uint16_t *ptr){
+    char *pChr = strtok (*appdata, ":");
+    pChr = strtok(NULL, ":");
+    *ptr = atoi(pChr);
+    printf("POINTER DATA: %d\n", *ptr);
 }
 
 // Handle unicast receive
 static void tcpip_handler(void) {
     char *appdata;
+    uint16_t temperature;
+    uint16_t vibrations;
+
     if(uip_newdata()) {
         appdata = (char *)uip_appdata;
         appdata[uip_datalen()] = 0;
         
+        // Network hearthbeat functionality
         if(strcmp(current_command, GET_HEART_BEAT) == 0) {
-            active++;
-            printf("Currently active: %d\n", active);
+            active_motes++;
+            printf("Currently active: %d\n", active_motes);
         } else if(strcmp(current_command, GET_TEMP_MIN) == 0){
-            
-            // Parse recevied result
-            uint16_t temperature;
-            parseResult(&appdata, &temperature, 1);
-            if (network_min->temp > temperature) {
+            // Parse received result
+            parseResult(&appdata, &temperature);
+            if (network_min->temp < temperature) {
                 network_min->temp = temperature;
             }
-
+            printf("Min temp so far: %d\n", network_min->temp);
         } else if(strcmp(current_command, GET_TEMP_MAX) == 0){
-            network_max->temp = 2;
+            parseResult(&appdata, &temperature);
+            if (network_max->temp < temperature) {
+                network_max->temp = temperature;
+            }
+            printf("Max temp so far: %d\n", network_max->temp);
         } else if(strcmp(current_command, GET_TEMP_AVG) == 0){
-            //network_min.min_temp = atof(appdata);
+            parseResult(&appdata, &temperature);
+            network_avg->temp += temperature;
+            data_recv_temp += 1;
+            printf("Average current temperature: %d\n", 
+                    network_avg->temp / data_recv_temp);
+            if(data_recv_temp > active_motes) {
+                data_recv_temp = 0;
+            }
         } else if(strcmp(current_command, GET_VIB_MIN) == 0){
-            network_min->vib = 5;
+            parseResult(&appdata, &vibrations);
+            if (network_min->vib > vibrations) {
+                network_min->vib = vibrations;
+            }
+            printf("Min vibrations so far: %d\n", network_min->vib);
         } else if(strcmp(current_command, GET_VIB_MAX) == 0){
-            network_max->vib = 1;
+            parseResult(&appdata, &vibrations);
+            if (network_max->vib < vibrations) {
+                network_max->vib = vibrations;
+            }
+            printf("Max vibrations so far: %d\n", network_max->vib);
         } else if(strcmp(current_command, GET_VIB_AVG) == 0){
-            printf("Got new avg vibrations: %s\n", appdata);
+            parseResult(&appdata, &vibrations);
+            network_avg->vib += temperature;
+            data_recv_temp += 1;
+            printf("Average current temperature: %d\n", 
+                    network_avg->vib / data_recv_vib);
+            if(data_recv_vib > active_motes) {
+                data_recv_vib = 0;
+            }
         // No command was executed
         } else {
             printf("Alarams: %s\n", appdata);
@@ -155,7 +169,7 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
     static struct etimer et;
     static struct etimer et_sensor;
     PROCESS_BEGIN();
-    PRINTF("Multicast Engine: '%s'\n", UIP_MCAST6.name);
+    printf("Multicast Engine: '%s'\n", UIP_MCAST6.name);
     NETSTACK_MAC.off(1);
     set_own_addresses();
     prepare_mcast();
@@ -200,7 +214,7 @@ PROCESS_THREAD(rpl_root_process, ev, data) {
             if(strcmp(GET_USAGE, current_command) == 0) {
                 usage();
             } else {
-                active = 0;
+                active_motes = 0;
                 multicast_send(current_command);
             }
 
